@@ -33,23 +33,27 @@
             y = 1;
         }
     }
-    else {
-        printf("Unknown variant!\n");
-        y = 0.0;
-    }
-
     return y;
 }
 
 //---Оголошення змінних
 int main() {
     double x, y;
+    int variant;
+    //----Введення номера варіанта
+    printf("Enter variant (8 or 9): ");
+    if (scanf("%d", &variant) != 1) {
+        return 1;
+    }
 //----Введення x
     printf("Enter x: ");
     if (scanf("%lf", &x) != 1) {
         return 1;
     }
-
+ //----ПЕРЕВІРКА ВАРІАНТА
+    if (variant != 8 && variant != 9) {
+        printf("Unknown variant!\n");
+        return 1;
     //-----Розрахунок y
     y = calculate_y(x, variant);
 
