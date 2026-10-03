@@ -1,23 +1,25 @@
-// Забезпечує функціонал для введення та виведення даних (printf)
+// Бібліотека для стандартного введення та виведення даних
 #include <stdio.h>
-// Стандартна бібліотека загального призначення.
+// stdlib.h — стандартна бібліотека загального призначення
 #include <stdlib.h>
-// Надає математичні функції та константи.
+// math.h — бібліотека математичних функцій
 #include <math.h>
-// бібліотека для консольного введення/виведення. використовується для функції getch()
+// conio.h — бібліотека для роботи з консоллю, використовується getch()
 #include <conio.h>
 
 //----Підінтегральна функція----
-//----Для кожного варіанту використовується своя формула----
+// double — тип даних з плаваючою комою подвійної точності
+// integrand_expression — назва функції
+// double x — параметр x типу double
+// int variant — параметр variant цілого типу
 double integrand_expression(double x, int variant)
 {
     //----Функція для 8-го варіанту----
-    //----f(x) = (1 + sqrt(x)) / x^2----
     if (variant == 8)
         return (1.0 + sqrt(x)) / (x * x);
 
     //----Функція для 9-го варіанту----
-    //----f(x) = x * e^(x^2)----
+    // else — виконується, якщо умова if була хибною
     else
         return x * exp(x * x);
 }
@@ -33,6 +35,7 @@ double left_rectangles(double a, double b, unsigned int n, int variant)
     double sum = 0.0;
 
     //----Обчислюємо значення функції в лівих точках----
+    // unsigned int — цілий тип без знака, використовується для додатних значень
     for (unsigned int i = 0; i < n; i++)
         sum += integrand_expression(a + i * h, variant);
 
@@ -118,8 +121,9 @@ int main()
     //----Оголошення змінних----
     double a, b, eps;
     double I1, I2, delta;
-
+// unsigned int — цілий тип даних без знака
     unsigned int n;
+    // int — цілий тип даних
     int variant, method;
 
 
@@ -128,7 +132,7 @@ int main()
     {
         printf("\nEnter variant (8 or 9): ");
         scanf("%d", &variant);
-
+// while — умова продовження циклу
     } while (variant != 8 && variant != 9);
 
 
@@ -191,11 +195,13 @@ int main()
 
 
     //----Визначаємо обраний метод----
+    // switch — оператор вибору одного з декількох варіантів
     switch (method)
     {
         case 1:
             printf("\n*Left rectangles method*\n");
             calc_method = left_rectangles;
+            // break — завершення поточного case
             break;
 
         case 2:
@@ -227,6 +233,7 @@ int main()
         I2 = calc_method(a, b, n + 2, variant);
 
         //----Знаходимо різницю між двома результатами----
+        // fabs() — функція знаходження модуля числа типу double
         delta = fabs(I1 - I2);
 
         //----Якщо точність недостатня, збільшуємо N на 2----
