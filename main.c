@@ -116,6 +116,7 @@ double simpson(double a, double b, unsigned int n, int variant)
 
 
 //----Головна функція програми----
+//--Вхід у програму
 int main()
 {
     //----Оголошення змінних----
