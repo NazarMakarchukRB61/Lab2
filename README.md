@@ -3,4 +3,4 @@
 // Блок-схема для другої частини лабораторної роботи
 <img width="1024" height="1536" alt="Блок-схема для лабораторної 2,2" src="https://github.com/user-attachments/assets/e7677a1c-c5fa-4449-a6d4-af6fb3d9ae7a" />
 // Результат роботи для цього коду
-<img width="1103" height="644" alt="image" src="https://github.com/user-attachments/assets/7c185cab-91c6-462a-93bc-79746ecf8bc1" />
+<img width="1103" height="636" alt="image" src="https://github.com/user-attachments/assets/45d338bc-ceca-432f-a57d-616e96046695" />
