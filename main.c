@@ -17,22 +17,17 @@ double left_rectangles(double a, double b, unsigned int n)
     return h * sum;
 }
 
-//----Метод правих прямокутників----
-double right_rectangles(double a, double b, unsigned int n, int variant)
+double right_rectangles(double a, double b, unsigned int n)
 {
-    //----Обчислюємо ширину одного проміжку----
-    double h = (b - a) / (double)n;
+    double h = (b - a) / n, sum = 0.0;
     unsigned int i;
 
     for (i = 1; i <= n; i++)
         sum += integrand_expression(a + i * h);
 
-    //----Множимо суму висот на ширину проміжку----
-    return sum * h;
+    return h * sum;
 }
 
-
-//----Метод трапецій----
 double trapezoids(double a, double b, unsigned int n)
 {
     double h = (b - a) / n;
@@ -46,8 +41,6 @@ double trapezoids(double a, double b, unsigned int n)
     return h * sum;
 }
 
-
-//----Метод парабол (метод Сімпсона)----
 double simpson(double a, double b, unsigned int n)
 {
     double h, odd = 0.0, even = 0.0;
@@ -72,8 +65,6 @@ double simpson(double a, double b, unsigned int n)
             4.0 * odd + 2.0 * even);
 }
 
-//----Головна функція програми----
-//--Вхід у програму
 int main(void)
 {
     double a = 0.5, b = 4.0, eps, i1, i2, delta;
@@ -147,33 +138,20 @@ int main(void)
 
     // Виклик функції через вказівник
     // calc_method(...) — виклик функції, адресу якої збережено
+    n = 2;
 
-printf("Enter initial N: ");
-scanf("%u", &n);
+    do
+    {
+        i1 = calc_method(a, b, n);
+        i2 = calc_method(a, b, n + 2);
+        delta = fabs(i1 - i2);
 
-if (n == 0)
-{
-    printf("N must be greater than 0.\n");
-    return 1;
-}
+        if (delta > eps)
+            n += 2;
 
-// Для методу Сімпсона N має бути парним
-if (method == 4 && n % 2 != 0)
-    n++;
+    } while (delta > eps && n < 1000000);
 
-do
-{
-    i1 = calc_method( a, b, n);
-    i2 = calc_method( a, b, n + 2);
-    delta = fabs(i1 - i2);
-
-    if (delta > eps)
-        n += 2;
-
-} while (delta > eps && n < 1000000);
-
-N = n;
-
+    N = n;
 
     printf("\nRequired N = %u\n", N);
     printf("I(N) = %.10f\n", i1);
