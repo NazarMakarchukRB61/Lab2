@@ -1,61 +1,31 @@
-// Бібліотека для стандартного введення та виведення даних
-#include <stdio.h>
-// stdlib.h — стандартна бібліотека загального призначення
-#include <stdlib.h>
-// math.h — бібліотека математичних функцій
-#include <math.h>
-// conio.h — бібліотека для роботи з консоллю, використовується getch()
-#include <conio.h>
+#include <stdio.h>  // Директива підключення бібліотеки введення та виведення
+#include <math.h>   // Бібліотека математичних функцій
 
-//----Підінтегральна функція----
-// double — тип даних з плаваючою комою подвійної точності
-// integrand_expression — назва функції
-// double x — параметр x типу double
-// int variant — параметр variant цілого типу
-double integrand_expression(double x, int variant)
+double integrand_expression(double x)
 {
-    //----Функція для 8-го варіанту----
-    if (variant == 8)
-        return (1.0 + sqrt(x)) / (x * x);
-
-    //----Функція для 9-го варіанту----
-    // else — виконується, якщо умова if була хибною
-    else
-        return x * exp(x * x);
+    return (1.0 + sqrt(x)) / (x * x);
 }
 
-
-//----Метод лівих прямокутників----
-double left_rectangles(double a, double b, unsigned int n, int variant)
+double left_rectangles(double a, double b, unsigned int n)
 {
-    //----Обчислюємо ширину одного проміжку----
-    double h = (b - a) / (double)n;
+    double h = (b - a) / n, sum = 0.0;
+    unsigned int i;
 
-    //----Змінна для накопичення суми----
-    double sum = 0.0;
+    for (i = 0; i < n; i++)
+        sum += integrand_expression(a + i * h);
 
-    //----Обчислюємо значення функції в лівих точках----
-    // unsigned int — цілий тип без знака, використовується для додатних значень
-    for (unsigned int i = 0; i < n; i++)
-        sum += integrand_expression(a + i * h, variant);
-
-    //----Множимо суму висот на ширину проміжку----
-    return sum * h;
+    return h * sum;
 }
-
 
 //----Метод правих прямокутників----
 double right_rectangles(double a, double b, unsigned int n, int variant)
 {
     //----Обчислюємо ширину одного проміжку----
     double h = (b - a) / (double)n;
+    unsigned int i;
 
-    //----Змінна для накопичення суми----
-    double sum = 0.0;
-
-    //----Обчислюємо значення функції в правих точках----
-    for (unsigned int i = 1; i <= n; i++)
-        sum += integrand_expression(a + i * h, variant);
+    for (i = 1; i <= n; i++)
+        sum += integrand_expression(a + i * h);
 
     //----Множимо суму висот на ширину проміжку----
     return sum * h;
@@ -63,198 +33,152 @@ double right_rectangles(double a, double b, unsigned int n, int variant)
 
 
 //----Метод трапецій----
-double trapezoids(double a, double b, unsigned int n, int variant)
+double trapezoids(double a, double b, unsigned int n)
 {
-    //----Обчислюємо ширину одного проміжку----
-    double h = (b - a) / (double)n;
+    double h = (b - a) / n;
+    double sum = (integrand_expression(a) +
+                  integrand_expression(b)) / 2.0;
+    unsigned int i;
 
-    //----Змінна для накопичення суми внутрішніх точок----
-    double sum = 0.0;
+    for (i = 1; i < n; i++)
+        sum += integrand_expression(a + i * h);
 
-    //----Додаємо значення функції у внутрішніх точках----
-    for (unsigned int i = 1; i < n; i++)
-        sum += integrand_expression(a + i * h, variant);
-
-    //----Формула методу трапецій----
-    //----Кінцеві значення функції додаються окремо----
-    return (h / 2.0) *
-           (integrand_expression(a, variant) +
-            integrand_expression(b, variant) +
-            2.0 * sum);
+    return h * sum;
 }
 
 
 //----Метод парабол (метод Сімпсона)----
-double simpson(double a, double b, unsigned int n, int variant)
+double simpson(double a, double b, unsigned int n)
 {
-    //----Для методу Сімпсона кількість проміжків повинна бути парною----
+    double h, odd = 0.0, even = 0.0;
+    unsigned int i;
+
     if (n % 2 != 0)
         n++;
 
-    //----Обчислюємо ширину одного проміжку----
-    double h = (b - a) / (double)n;
+    h = (b - a) / n;
 
-    //----Суми для непарних і парних точок----
-    double odd = 0.0;
-    double even = 0.0;
+    for (i = 1; i < n; i++)
+    {
+        if (i % 2 != 0)
+            odd += integrand_expression(a + i * h);
+        else
+            even += integrand_expression(a + i * h);
+    }
 
-    //----Обчислюємо суму значень у непарних точках----
-    for (unsigned int i = 1; i < n; i += 2)
-        odd += integrand_expression(a + i * h, variant);
-
-    //----Обчислюємо суму значень у парних точках----
-    for (unsigned int i = 2; i < n; i += 2)
-        even += integrand_expression(a + i * h, variant);
-
-    //----Формула методу Сімпсона----
-    return (h / 3.0) *
-           (integrand_expression(a, variant) +
-            integrand_expression(b, variant) +
-            4.0 * odd +
-            2.0 * even);
+    return h / 3.0 *
+           (integrand_expression(a) +
+            integrand_expression(b) +
+            4.0 * odd + 2.0 * even);
 }
-
 
 //----Головна функція програми----
 //--Вхід у програму
-int main()
+int main(void)
 {
-    //----Оголошення змінних----
-    double a, b, eps;
-    double I1, I2, delta;
-// unsigned int — цілий тип даних без знака
-    unsigned int n;
-    // int — цілий тип даних
-    int variant, method;
+    double a = 0.5, b = 4.0, eps, i1, i2, delta;
 
+    // Вказівник на функцію:
+    // double — тип значення, яке повертає функція
+    // *calc_method — оголошення вказівника
+    // (double, double, unsigned int) — типи параметрів
+    // NULL — спеціальне значення нульового вказівника
+    double (*calc_method)(double, double, unsigned int) = NULL;
 
-    //----Вибір варіанту----
-    do
-    {
-        printf("\nEnter variant (8 or 9): ");
-        scanf("%d", &variant);
-// while — умова продовження циклу
-    } while (variant != 8 && variant != 9);
+    unsigned int n, N;
+    unsigned int values[] = {10, 100, 1000, 10000};
+    unsigned int k;
+    int method;
 
+    printf("Variant 8: f(x) = (1 + sqrt(x)) / x^2\n");
+    printf("Interval: [%.1f; %.1f]\n", a, b);
+    printf("1 - Left rectangles\n");
+    printf("2 - Right rectangles\n");
+    printf("3 - Trapezoids\n");
+    printf("4 - Simpson\n");
+    printf("Choose method: ");
+    scanf("%d", &method);
 
-    //----Встановлення меж інтегрування----
-    //----Для 8-го варіанту: [0.5; 4]----
-    //----Для 9-го варіанту: [1; 2]----
-    if (variant == 8)
-    {
-        a = 0.5;
-        b = 4.0;
-    }
-    else
-    {
-        a = 1.0;
-        b = 2.0;
-    }
-
-
-    //----Виведення меж інтегрування----
-    printf("\nIntegration interval: [%.2lf; %.2lf]\n", a, b);
-
-
-    //----Введення кількості проміжків N----
-    do
-    {
-        printf("\nEnter number of intervals (N > 0): ");
-        scanf("%u", &n);
-
-    } while (n == 0);
-
-
-    //----Введення допустимої похибки----
-    do
-    {
-        printf("\nEnter measurement error: ");
-        scanf("%lf", &eps);
-
-    } while (eps <= 0);
-
-
-    //----Вибір методу обчислення інтеграла----
-    do
-    {
-        printf("\nChoose the method:\n");
-        printf("\t1. Left rectangles\n");
-        printf("\t2. Right rectangles\n");
-        printf("\t3. Trapezoids\n");
-        printf("\t4. Simpson\n");
-        printf("(1-4): ");
-
-        scanf("%d", &method);
-
-    } while (method < 1 || method > 4);
-
-
-    //----Вказівник на обраний метод----
-    //----Дозволяє використовувати один алгоритм пошуку N----
-    //----для будь-якого з чотирьох методів----
-    double (*calc_method)(double, double, unsigned int, int) = NULL;
-
-
-    //----Визначаємо обраний метод----
-    // switch — оператор вибору одного з декількох варіантів
+    // switch — оператор вибору одного з варіантів
+    // case — позначення конкретного варіанта
+    // break — завершення поточної гілки switch
     switch (method)
     {
         case 1:
-            printf("\n*Left rectangles method*\n");
             calc_method = left_rectangles;
-            // break — завершення поточного case
             break;
-
         case 2:
-            printf("\n*Right rectangles method*\n");
             calc_method = right_rectangles;
             break;
-
         case 3:
-            printf("\n*Trapezoids method*\n");
             calc_method = trapezoids;
             break;
-
         case 4:
-            printf("\n*Simpson method*\n");
             calc_method = simpson;
             break;
+        default:
+            printf("Incorrect method.\n");
+            return 1;
     }
 
+    printf("Enter epsilon (0.00001 - 0.001): ");
+    scanf("%lf", &eps);
 
-    //----Підбір N за заданою точністю----
-    //----Порівнюємо I(N) та I(N+2)----
-    //----Умова зупинки: |I(N) - I(N+2)| <= eps----
-    do
+    if (eps < 0.00001 || eps > 0.001)
     {
-        //----Обчислюємо інтеграл для поточного N----
-        I1 = calc_method(a, b, n, variant);
+        printf("Incorrect epsilon.\n");
+        return 1;
+    }
 
-        //----Обчислюємо інтеграл для N+2----
-        I2 = calc_method(a, b, n + 2, variant);
+    printf("\nTable of integral values:\n");
+    printf("n\tLeft\t\tRight\t\tTrapezoid\tSimpson\n");
 
-        //----Знаходимо різницю між двома результатами----
-        // fabs() — функція знаходження модуля числа типу double
-        delta = fabs(I1 - I2);
+    for (k = 0; k < 4; k++)
+    {
+        n = values[k];
 
-        //----Якщо точність недостатня, збільшуємо N на 2----
-        if (delta > eps)
-            n += 2;
+        printf("%u\t%.8f\t%.8f\t%.8f\t%.8f\n",
+               n,
+               left_rectangles(a, b, n),
+               right_rectangles(a, b, n),
+               trapezoids(a, b, n),
+               simpson(a, b, n));
+    }
 
-    } while (delta > eps && n < 500000);
+    // Виклик функції через вказівник
+    // calc_method(...) — виклик функції, адресу якої збережено
+
+printf("Enter initial N: ");
+scanf("%u", &n);
+
+if (n == 0)
+{
+    printf("N must be greater than 0.\n");
+    return 1;
+}
+
+// Для методу Сімпсона N має бути парним
+if (method == 4 && n % 2 != 0)
+    n++;
+
+do
+{
+    i1 = calc_method( a, b, n);
+    i2 = calc_method( a, b, n + 2);
+    delta = fabs(i1 - i2);
+
+    if (delta > eps)
+        n += 2;
+
+} while (delta > eps && n < 1000000);
+
+N = n;
 
 
-    //----Виведення підсумкового результату----
-    printf("\n\ta = %.2lf", a);
-    printf("\n\tb = %.2lf", b);
-    printf("\n\tIntegral = %.8lf", I2);
-    printf("\n\tN = %u", n);
-    printf("\n\tDelta = %.8lf", delta);
-
-
-    //----Очікуємо натискання клавіші----
-    printf("\n\nPress any key to finish the program.");
-    getch();
+    printf("\nRequired N = %u\n", N);
+    printf("I(N) = %.10f\n", i1);
+    printf("I(N+2) = %.10f\n", i2);
+    printf("Delta = %.10f\n", delta);
 
     return 0;
 }
