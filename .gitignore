@@ -1,0 +1,7 @@
+bin/
+obj/
+*.exe
+*.o
+*.depend
+*.layout
+Lab2_18_09_1.*
